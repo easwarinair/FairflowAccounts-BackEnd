@@ -1,0 +1,90 @@
+/* cssstyles_transaction_form.css */
+
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: #e4d1dd;
+}
+
+header {
+    background-color: #e4d1dd; 
+    padding: 10px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.logo {
+    font-size: 24px;
+    margin-left: 20px;
+}
+
+.mag {
+    color: #CA047B;
+    font-family: Inter;
+    font-size: 30px;
+    font-weight: 800;
+    line-height: normal;
+}
+
+.black {
+    color: #000;
+    font-family: Inter;
+    font-size: 30px;
+    font-weight: 800;
+    line-height: normal;
+}
+
+.search-bar {
+    margin: 0 auto; 
+    width: 15cm; 
+    background-color: #e4d1dd;
+    border: 2px solid #ccc; 
+    border-radius: 15px; 
+    overflow: hidden; 
+}
+
+input[type="text"],
+input[type="number"] {
+    padding: 8px;
+    width: calc(100% - 16px); 
+    border: none; 
+    border-radius: 15px; 
+    outline: none; 
+    margin-top: 5px;
+}
+
+form {
+    margin-top: 20px;
+    background-color: #fff;
+    padding: 20px;
+    border-radius: 15px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.form-group {
+    margin-bottom: 15px;
+}
+
+label {
+    font-weight: bold;
+}
+
+button[type="submit"] {
+    padding: 10px 20px;
+    background-color: #CA047B;
+    color: #fff;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+button[type="submit"]:hover {
+    background-color: #a70055;
+}
+
+.logo a {
+    text-decoration: none; 
+    color: inherit; }

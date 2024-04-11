@@ -1,0 +1,97 @@
+
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: #e4d1dd;
+}
+
+header {
+    background-color: #e4d1dd; 
+    padding: 10px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.logo {
+    font-size: 24px;
+    margin-left: 20px;
+}
+
+.mag {
+    color: #CA047B;
+
+font-family: Inter;
+font-size: 30px;
+font-style: normal;
+font-weight: 800;
+line-height: normal;
+}
+
+.black {
+    color: #000;
+font-family: Inter;
+font-size: 30px;
+font-style: normal;
+font-weight: 800;
+line-height: normal;
+}
+
+.search-bar {
+margin: 0 auto; 
+width: 15cm; 
+background-color: #e4d1dd;
+border: 2px solid #ccc; 
+border-radius: 15px; 
+overflow: hidden; 
+}
+
+input {
+padding: 8px;
+width: 100%; 
+border: none; 
+border-radius: 15px; 
+outline: none; 
+}
+
+.circle-container {
+            display: flex;
+            margin-top: 50px;
+            margin-left: 40px;
+            height: 100vh;
+        }
+
+        .circle {
+            width: 150px;
+            height: 150px;
+            background-color: rgba(229, 110, 182, 0.81);
+            border-radius: 50%;
+            display: flex;
+            color: #fff;
+            font-size: 24px;
+            font-weight: bold;
+            background: url(profile.png),rgba(229, 110, 182, 0.81) -147.429px -64.061px / 234.432% 193.939% no-repeat;
+            
+        }
+        .circle img {
+            width: 100%; 
+            height: 100%;
+            object-fit: cover;
+        }
+
+       
+        .profile-name {
+            color: #CA047B;
+            margin-top: 120px;
+            font-family: Inter;
+            font-size: 23px;
+            font-weight: 700;
+            line-height: normal;
+            
+        }
+        .logo a {
+    text-decoration: none; 
+    color: inherit; }
+
+   
