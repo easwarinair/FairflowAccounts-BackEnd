@@ -21,7 +21,8 @@ const signer = new ethers.Wallet(
   "e213efeac1ac677e12a2fed41808636cf5e5bc95954434e0451069ff2f9dfac8",
   provider
 );
-console.log(contract)
+// console.log(contract)
+
 // const contractWithSigner = contract.connect(signer);
 // const response = await contractWithSigner.updatePhase(
 //   "Materials for foundation unloaded"

@@ -4,6 +4,7 @@ const dotenv = require("dotenv");
 const root_dir = __dirname.split("src")[0];
 dotenv.config({ path: path.join(root_dir, `.env`) });
 const { StatusCodes } = require("http-status-codes");
+const { removeBigInts } = require("./utils/removeBigInt");
 
 // blockchain status
 const { getProjectStatus } = require("./blockchain");
@@ -16,6 +17,7 @@ require("./blockchain");
 const bcrypt = require("bcrypt");
 const cors = require("cors");
 const session = require("express-session");
+const morgan = require("morgan");
 
 const app = express();
 app.use(express.json());
@@ -27,6 +29,8 @@ const corsOptions = {
   credentials: true,
 };
 app.use(cors(corsOptions));
+
+app.use(morgan("tiny"));
 
 app.use(
   session({
@@ -44,6 +48,11 @@ app.use(
 // app.get("/signup", (req, res) => {
 //   res.sendFile(path.join(__dirname, "login", "signup.html"));
 // });
+
+
+app.get("/api", (req, res) => {
+  res.status(200).json({ message: "Api alive at 5000" });
+});
 
 app.post("/signup", async (req, res) => {
   const { username, password } = req.body;
@@ -95,14 +104,20 @@ app.get("/profile", (req, res) => {
 });
 
 app.get("/project/status", async (req, res) => {
-  const result = await getProjectStatus();
-  if (result) res.status(StatusCodes.OK).json({ result: result[0] });
-  else
-    res
-      .status(StatusCodes.INTERNAL_SERVER_ERROR)
-      .json({ 
-        error: "An error occured while fetchinng status from blockchain",
+  try {
+    const result = await getProjectStatus();
+    const temp = removeBigInts(result);
+    if (result) res.status(StatusCodes.OK).json({ result: temp });
+    else
+      res.status(StatusCodes.SERVICE_UNAVAILABLE).json({
+        error: "An error occured while fetching status from blockchain",
       });
+  } catch (err) {
+    console.err(err);
+    res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
+      error: "An error occured while fetching status from blockchain",
+    });
+  }
 });
 
 const port = 5000;
