@@ -7,12 +7,12 @@ const { StatusCodes } = require("http-status-codes");
 const { removeBigInts } = require("./utils/removeBigInt");
 
 // blockchain status
-const { getProjectStatus } = require("./blockchain");
+const {getProjectStatus} = require("./blockchain/blockchain")
 
 // mongodb call
 const collection = require("./config");
 // web3 call
-require("./blockchain");
+require("./blockchain/blockchain");
 
 const bcrypt = require("bcrypt");
 const cors = require("cors");
@@ -64,8 +64,11 @@ app.post("/signup", async (req, res) => {
         error: "User already exists. Please choose a different username.",
       });
     }
+
+    // hashing password
     const saltRounds = 10;
     const hashedPassword = await bcrypt.hash(password, saltRounds);
+    
     const newUser = { name: username, password: hashedPassword };
     await collection.insertMany([newUser]);
     res.status(StatusCodes.CREATED).json({ id: newUser._id });
@@ -87,19 +90,10 @@ app.post("/login", async (req, res) => {
     const isPasswordMatch = await bcrypt.compare(password, user.password);
     if (isPasswordMatch) {
       req.session.username = username;
-      // res.redirect("/profile?user=" + encodeURIComponent(req.session.username));
       res.status(StatusCodes.OK).json({ id: req.session.username });
     } else {
       res.status(StatusCodes.BAD_REQUEST).json({ error: "Wrong Password" });
     }
-  }
-});
-
-app.get("/profile", (req, res) => {
-  if (req.session.username) {
-    res.sendFile(path.join(__dirname, "profiles", "profile.html"));
-  } else {
-    res.redirect("/");
   }
 });
 

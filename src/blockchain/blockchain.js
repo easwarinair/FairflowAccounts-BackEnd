@@ -3,7 +3,7 @@ const fs = require("fs-extra");
 console.log("Started calling blockchain");
 
 const abi = fs.readFileSync(
-  "./FairFlowAccounts_sol_FairFlowAccounts.abi",
+  "src/blockchain/FairFlowAccounts_sol_FairFlowAccounts.abi",
   "utf-8"
 );
 
