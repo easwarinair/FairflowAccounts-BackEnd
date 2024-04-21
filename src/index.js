@@ -25,8 +25,9 @@ app.use(express.urlencoded({ extended: false }));
 
 // cors
 const corsOptions = {
-  origin: `${process.env.APP_URL}`,
+  origin: 'http://localhost:3000', 
   credentials: true,
+  optionsSuccessStatus: 200
 };
 app.use(cors(corsOptions));
 
@@ -101,7 +102,9 @@ app.get("/project/status", async (req, res) => {
   try {
     const result = await getProjectStatus();
     const temp = removeBigInts(result);
-    if (result) res.status(StatusCodes.OK).json({ result: temp });
+    const blockCount = 4;
+   
+    if (result) res.status(StatusCodes.OK).json({ result: temp , blockCount: blockCount  });
     else
       res.status(StatusCodes.SERVICE_UNAVAILABLE).json({
         error: "An error occured while fetching status from blockchain",
