@@ -7,7 +7,10 @@ const { StatusCodes } = require("http-status-codes");
 const { removeBigInts } = require("./src/utils/removeBigInt");
 
 // blockchain status
-const { getProjectStatus } = require("./src/blockchain/blockchain");
+const {
+  getProjectStatus,
+  getContractTransactions,
+} = require("./src/blockchain/blockchain");
 
 // mongodb call
 const collection = require("./src/config");
