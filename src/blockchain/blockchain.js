@@ -67,10 +67,10 @@ async function getProjectStatus() {
   const status = await contract.getProjectStatus();
   if (status) {
     const projectStatus = {
-      title: status[0],
+      title: status[0].toString(),
       currentPhase: status[1].toString(),
-      phaseDescription: status[2],
-      latestUpdate: status[3],
+      phaseDescription: status[2].toString(),
+      latestUpdate: status[3].toString(),
       balance: status[4].toString(),
       fundsReceived: status[5].toString(),
       fundsSpent: status[6].toString(),
@@ -118,7 +118,7 @@ async function getContractTransactions() {
       return makeTransaction(
         tempInterface.signature,
         tempInterface.args,
-        tx.value
+        tx.value.toString()
       );
     })
   );

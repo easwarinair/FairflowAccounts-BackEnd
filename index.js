@@ -105,6 +105,7 @@ app.get("/project/status", async (req, res) => {
     console.log(`Data received: ${result}`);
     // const temp = removeBigInts(result);
     const txs = await getContractTransactions();
+    console.log("Got transactions", txs);
     const blockCount = txs.length;
 
     if (result)
