@@ -4,6 +4,7 @@ const dotenv = require("dotenv").config({
   path: path.join(__dirname, "..", "..", ".env"),
 });
 const fs = require("fs-extra");
+const { sign } = require("crypto");
 
 console.log("Started calling blockchain");
 const abi = fs.readFileSync(
@@ -20,16 +21,6 @@ const contractAddress = process.env.CONTRACT_ADDRESS;
 // Connect to the contract
 const contract = new ethers.Contract(contractAddress, abi, provider);
 const signer = new ethers.Wallet(process.env.PRIVATE_KEY, provider);
-
-// console.log(contract)
-
-// const contractWithSigner = contract.connect(signer);
-// const response = await contractWithSigner.updatePhase(
-//   "Materials for foundation unloaded"
-// );
-// console.log(response);
-// const status = await contract.getProjectStatus();
-// console.log(`contract connected... Contract details: ${status}`);
 
 async function addManager(newManagerAddress) {
   const contractWithSigner = contract.connect(signer);
@@ -80,8 +71,9 @@ async function getProjectStatus() {
       currentPhase: status[1].toString(),
       phaseDescription: status[2],
       latestUpdate: status[3],
-      fundsReceived: status[4].toString(),
-      fundsSpent: status[5].toString(),
+      balance: status[4].toString(),
+      fundsReceived: status[5].toString(),
+      fundsSpent: status[6].toString(),
     };
     return projectStatus;
   } else return null;
@@ -102,6 +94,11 @@ async function getSigner() {
   return provider.getSigner();
 }
 
+function makeTransaction(signature, args, value) {
+  const transaction = { sign: signature, arg: args, val: value.toString() };
+  return transaction;
+}
+
 async function getContractTransactions() {
   const logs = await provider.getLogs({
     fromBlock: 0,
@@ -117,32 +114,16 @@ async function getContractTransactions() {
 
   const transactionDetails = await Promise.all(
     transactions.map((tx) => {
-      return interface.parseTransaction({ data: tx.data });
+      const tempInterface = interface.parseTransaction({ data: tx.data });
+      return makeTransaction(
+        tempInterface.signature,
+        tempInterface.args,
+        tx.value
+      );
     })
   );
   return transactionDetails;
 }
-
-// addManager("0x587ef81fe78b2126843fd0df8078ef6a4586c0f4").then(() => {});
-// fundProject(0.1).then(() => {
-//   console.log("Project funded with 0.1 eth");
-// });
-// updatePhase("0.1Eth added")
-//   .then(() => {
-//     console.log("latest update added");
-//   });
-
-// completePhase()
-//   .then(() => {
-//     console.log("Phase completed");
-//   });
-// sendFunds("0x587ef81fe78b2126843fd0df8078ef6a4586c0f4", 0.1, "Reimbursement")
-//   .then(() => {
-//     console.log("money back guarantee");
-//   });
-// getProjectStatus().then((value) => {
-//   console.log(value);
-// });
 
 getContractTransactions().then((transactions) => {
   console.log("Transactions: ", transactions);
