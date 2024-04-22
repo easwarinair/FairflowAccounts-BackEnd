@@ -4,15 +4,15 @@ const dotenv = require("dotenv");
 const root_dir = __dirname.split("src")[0];
 dotenv.config({ path: path.join(root_dir, `.env`) });
 const { StatusCodes } = require("http-status-codes");
-const { removeBigInts } = require("./utils/removeBigInt");
+const { removeBigInts } = require("./src/utils/removeBigInt");
 
 // blockchain status
-const { getProjectStatus } = require("./blockchain/blockchain");
+const { getProjectStatus } = require("./src/blockchain/blockchain");
 
 // mongodb call
-const collection = require("./config");
+const collection = require("./src/config");
 // web3 call
-require("./blockchain/blockchain");
+require("./src/blockchain/blockchain");
 
 const bcrypt = require("bcrypt");
 const cors = require("cors");
