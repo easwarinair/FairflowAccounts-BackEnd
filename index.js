@@ -101,12 +101,13 @@ app.get("/project/status", async (req, res) => {
     const result = await getProjectStatus();
     console.log(`Data received: ${result}`);
     // const temp = removeBigInts(result);
-    const blockCount = 4;
+    const txs = await getContractTransactions();
+    const blockCount = txs.length;
 
     if (result)
       res
         .status(StatusCodes.OK)
-        .json({ result: result, blockCount: blockCount });
+        .json({ result: result, blockCount: blockCount, transactions: txs });
     else
       res.status(StatusCodes.SERVICE_UNAVAILABLE).json({
         error: "An error occured while fetching status from blockchain",

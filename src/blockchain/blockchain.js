@@ -134,4 +134,5 @@ module.exports = {
   getProjectStatus,
   sendEtherToContract,
   getSigner,
+  getContractTransactions,
 };
