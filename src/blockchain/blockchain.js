@@ -125,6 +125,8 @@ async function getContractTransactions() {
   return transactionDetails;
 }
 
+updatePhase("Testing");
+
 module.exports = {
   addManager,
   fundProject,
