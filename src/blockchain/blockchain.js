@@ -8,7 +8,7 @@ const { sign } = require("crypto");
 
 console.log("Started calling blockchain");
 const abi = fs.readFileSync(
-  "FairFlowAccounts_sol_FairFlowAccounts.abi",
+  path.join(__dirname, "FairFlowAccounts_sol_FairFlowAccounts.abi"),
   "utf-8"
 );
 
