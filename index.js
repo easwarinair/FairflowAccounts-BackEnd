@@ -24,12 +24,12 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 
 // cors
-const corsOptions = {
-  origin: /.*.vercel.app.*/g,
-  credentials: true,
-  optionsSuccessStatus: 200,
-};
-app.use(cors(corsOptions));
+// const corsOptions = {
+//   origin: /.*.vercel.app.*/g,
+//   credentials: true,
+//   optionsSuccessStatus: 200,
+// };
+app.use(cors());
 
 app.use(morgan("tiny"));
 
