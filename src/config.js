@@ -1,4 +1,5 @@
 const { MongoClient, ServerApiVersion } = require("mongodb");
+const mongoose = require("mongoose");
 const path = require("path");
 const dotenv = require("dotenv").config({
   path: path.join(__dirname, "..", ".env"),
@@ -17,30 +18,13 @@ async function run() {
   try {
     // Connect the client to the server	(optional starting in v4.7)
     await client.connect();
-    // Send a ping to confirm a successful connection
-    await client.db("admin").command({ ping: 1 });
-    const users = await client.db("fairflowAccounts").collection("users");
-
-    console.log(await users.distinct("name"));
   } catch (e) {
     console.log(e);
   }
 }
 run().catch(console.dir);
 
-// // Create Schema
-// const Loginschema = new mongoose.Schema({
-//   name: {
-//     type: String,
-//     required: true,
-//   },
-//   password: {
-//     type: String,
-//     required: true,
-//   },
-// });
+// collection part
+const collection = client.db("fairflowAccounts").collection("users");
 
-// // collection part
-// const collection = new mongoose.model("users", Loginschema);
-
-// module.exports = collection;
+module.exports = collection;
