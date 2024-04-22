@@ -7,7 +7,7 @@ const { StatusCodes } = require("http-status-codes");
 const { removeBigInts } = require("./utils/removeBigInt");
 
 // blockchain status
-const {getProjectStatus} = require("./blockchain/blockchain")
+const { getProjectStatus } = require("./blockchain/blockchain");
 
 // mongodb call
 const collection = require("./config");
@@ -25,9 +25,9 @@ app.use(express.urlencoded({ extended: false }));
 
 // cors
 const corsOptions = {
-  origin: 'http://localhost:3000', 
+  origin: "http://localhost:3000",
   credentials: true,
-  optionsSuccessStatus: 200
+  optionsSuccessStatus: 200,
 };
 app.use(cors(corsOptions));
 
@@ -50,9 +50,8 @@ app.use(
 //   res.sendFile(path.join(__dirname, "login", "signup.html"));
 // });
 
-
 app.get("/api", (req, res) => {
-  res.status(200).json({ message: "Api alive at 5000" });
+  res.status(200).json({ message: `Api alive at ${port}` });
 });
 
 app.post("/signup", async (req, res) => {
@@ -69,7 +68,7 @@ app.post("/signup", async (req, res) => {
     // hashing password
     const saltRounds = 10;
     const hashedPassword = await bcrypt.hash(password, saltRounds);
-    
+
     const newUser = { name: username, password: hashedPassword };
     await collection.insertMany([newUser]);
     res.status(StatusCodes.CREATED).json({ id: newUser._id });
@@ -104,8 +103,11 @@ app.get("/project/status", async (req, res) => {
     console.log(`Data received: ${result}`);
     // const temp = removeBigInts(result);
     const blockCount = 4;
-   
-    if (result) res.status(StatusCodes.OK).json({ result: result , blockCount: blockCount  });
+
+    if (result)
+      res
+        .status(StatusCodes.OK)
+        .json({ result: result, blockCount: blockCount });
     else
       res.status(StatusCodes.SERVICE_UNAVAILABLE).json({
         error: "An error occured while fetching status from blockchain",
@@ -117,8 +119,26 @@ app.get("/project/status", async (req, res) => {
     });
   }
 });
+const port = 6969;
+const tryListen = (port) => {
+  app
+    .listen(port, () => {
+      console.log(`Server listening on port ${port}`);
+    })
+    .on("error", (err) => {
+      if (err.code === "EADDRINUSE") {
+        // Port is already in use, select a random port excluding commonly used ports
+        const excludedPorts = [80, 443, 8080]; // Add more ports to exclude if needed
+        let newPort;
+        do {
+          newPort = Math.floor(Math.random() * 65536); // Random port between 0 and 65535
+        } while (excludedPorts.includes(newPort));
+        tryListen(newPort); // Try listening on the new port
+      } else {
+        // Some other error occurred, log it
+        console.error(err);
+      }
+    });
+};
 
-const port = 5000;
-app.listen(port, () => {
-  console.log(`Server listening on port ${port}`);
-});
+tryListen(port); // Start by trying port 6969
