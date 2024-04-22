@@ -125,10 +125,6 @@ async function getContractTransactions() {
   return transactionDetails;
 }
 
-getContractTransactions().then((transactions) => {
-  console.log("Transactions: ", transactions);
-});
-
 module.exports = {
   addManager,
   fundProject,
