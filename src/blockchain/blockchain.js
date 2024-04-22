@@ -117,7 +117,7 @@ async function getContractTransactions() {
       const tempInterface = interface.parseTransaction({ data: tx.data });
       return makeTransaction(
         tempInterface.signature,
-        tempInterface.args,
+        tempInterface.args.toString(),
         tx.value.toString()
       );
     })

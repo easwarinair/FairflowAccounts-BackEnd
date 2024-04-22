@@ -102,7 +102,7 @@ app.post("/login", async (req, res) => {
 app.get("/project/status", async (req, res) => {
   try {
     const result = await getProjectStatus();
-    console.log(`Data received: ${result}`);
+    console.log(`Data received`, result);
     // const temp = removeBigInts(result);
     const txs = await getContractTransactions();
     console.log("Got transactions", txs);
