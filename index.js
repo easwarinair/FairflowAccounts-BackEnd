@@ -22,8 +22,16 @@ const morgan = require("morgan");
 const app = express();
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
-app.use(cors());
 app.use(morgan("tiny"));
+const corsOptions = {
+  origin: "https://fair-flow-accounts-front-end.vercel.app", // This is the frontend origin
+  optionsSuccessStatus: 200,
+  credentials: true, // This is needed if your front-end needs to send credentials like cookies or authentication headers.
+  allowedHeaders: ["Content-Type", "Authorization"],
+  methods: ["GET", "POST", "PUT", "DELETE"],
+};
+app.use(cors(corsOptions));
+
 app.use(
   session({
     secret: "your secret key",
