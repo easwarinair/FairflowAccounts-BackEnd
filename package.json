@@ -16,7 +16,8 @@
     "hbs": "^4.2.0",
     "http-status-codes": "^2.3.0",
     "mongoose": "^8.3.1",
-    "nodemon": "^3.1.0"
+    "nodemon": "^3.1.0",
+    "solc": "^0.8.7-fixed"
   },
   "devDependencies": {
     "morgan": "^1.10.0"

@@ -101,16 +101,17 @@ app.post("/login", async (req, res) => {
 app.get("/project/status", async (req, res) => {
   try {
     const result = await getProjectStatus();
-    const temp = removeBigInts(result);
+    console.log(`Data received: ${result}`);
+    // const temp = removeBigInts(result);
     const blockCount = 4;
    
-    if (result) res.status(StatusCodes.OK).json({ result: temp , blockCount: blockCount  });
+    if (result) res.status(StatusCodes.OK).json({ result: result , blockCount: blockCount  });
     else
       res.status(StatusCodes.SERVICE_UNAVAILABLE).json({
         error: "An error occured while fetching status from blockchain",
       });
   } catch (err) {
-    console.err(err);
+    console.error(err);
     res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
       error: "An error occured while fetching status from blockchain",
     });
