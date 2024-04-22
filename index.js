@@ -25,7 +25,7 @@ app.use(express.urlencoded({ extended: false }));
 
 // cors
 const corsOptions = {
-  origin: /\.vercel\.app$/,
+  origin: /.*.vercel.app\/.*/g,
   credentials: true,
   optionsSuccessStatus: 200,
 };
