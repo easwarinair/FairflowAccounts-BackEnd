@@ -94,8 +94,14 @@ async function getSigner() {
   return provider.getSigner();
 }
 
-function makeTransaction(signature, args, value) {
-  const transaction = { sign: signature, arg: args, val: value.toString() };
+function makeTransaction(signature, args, value, sender, receiver) {
+  const transaction = {
+    sign: signature,
+    arg: args,
+    val: value.toString(),
+    sender: sender,
+    receiver: receiver,
+  };
   return transaction;
 }
 
@@ -111,22 +117,45 @@ async function getContractTransactions() {
   const transactions = await Promise.all(
     logs.map(async (log) => await provider.getTransaction(log.transactionHash))
   );
+  console.log("transacion count:", transactions.length);
 
   const transactionDetails = await Promise.all(
     transactions.map((tx) => {
       const tempInterface = interface.parseTransaction({ data: tx.data });
-      return makeTransaction(
-        tempInterface.signature != null
-          ? tempInterface.signature.toString()
-          : "",
-        tempInterface.args.toString(),
-        tx.value.toString()
-      );
+      if (tempInterface != null) {
+        if (tx.hash == process.env.TX_HASH) {
+          return makeTransaction(
+            "contractCreated()",
+            "contractData",
+            tx.value.toString(),
+            tx.from.toString(),
+            tx.to.toString()
+          );
+        } else {
+          return makeTransaction(
+            tempInterface.signature.toString(),
+            tempInterface.args.toString(),
+            tx.value.toString(),
+            tx.from.toString(),
+            tx.to.toString()
+          );
+        }
+      } else {
+        return makeTransaction(
+          "sendEtherToContract()",
+          tx.value.toString(),
+          tx.value.toString(),
+          tx.from.toString(),
+          tx.to.toString()
+        );
+      }
     })
   );
+  console.log("tx details:", transactionDetails);
   return transactionDetails;
 }
 
+getContractTransactions().then(() => {});
 module.exports = {
   addManager,
   fundProject,
