@@ -121,12 +121,21 @@ async function getContractTransactions() {
 
   const transactionDetails = await Promise.all(
     transactions.map((tx) => {
-      const tempInterface = interface.parseTransaction({ data: tx.data });
-      if (tempInterface != null) {
-        if (tx.hash == process.env.TX_HASH) {
+      // console.log(tempInterface);
+      if (tx.hash == process.env.TX_HASH) {
+        return makeTransaction(
+          "contractCreated()",
+          "contractData",
+          tx.value.toString(),
+          tx.from.toString(),
+          process.env.CONTRACT_ADDRESS
+        );
+      } else {
+        const tempInterface = interface.parseTransaction({ data: tx.data });
+        if (tempInterface == null) {
           return makeTransaction(
-            "contractCreated()",
-            "contractData",
+            "sendEtherToContract()",
+            tx.value.toString(),
             tx.value.toString(),
             tx.from.toString(),
             tx.to.toString()
@@ -140,14 +149,6 @@ async function getContractTransactions() {
             tx.to.toString()
           );
         }
-      } else {
-        return makeTransaction(
-          "sendEtherToContract()",
-          tx.value.toString(),
-          tx.value.toString(),
-          tx.from.toString(),
-          tx.to.toString()
-        );
       }
     })
   );
@@ -156,6 +157,7 @@ async function getContractTransactions() {
 }
 
 getContractTransactions().then(() => {});
+
 module.exports = {
   addManager,
   fundProject,

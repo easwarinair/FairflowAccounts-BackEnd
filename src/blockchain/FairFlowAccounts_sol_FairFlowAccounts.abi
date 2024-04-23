@@ -58,12 +58,6 @@
 				"internalType": "uint256",
 				"name": "amount",
 				"type": "uint256"
-			},
-			{
-				"indexed": false,
-				"internalType": "string",
-				"name": "purpose",
-				"type": "string"
 			}
 		],
 		"name": "FundsSent",
@@ -93,9 +87,9 @@
 		"inputs": [
 			{
 				"indexed": false,
-				"internalType": "string",
+				"internalType": "uint256",
 				"name": "phase",
-				"type": "string"
+				"type": "uint256"
 			}
 		],
 		"name": "PhaseCompleted",
@@ -106,18 +100,18 @@
 		"inputs": [
 			{
 				"indexed": false,
-				"internalType": "string",
+				"internalType": "uint256",
 				"name": "phase",
-				"type": "string"
-			},
-			{
-				"indexed": false,
-				"internalType": "string",
-				"name": "update",
-				"type": "string"
+				"type": "uint256"
 			}
 		],
 		"name": "PhaseUpdated",
+		"type": "event"
+	},
+	{
+		"anonymous": false,
+		"inputs": [],
+		"name": "ProjectCreated",
 		"type": "event"
 	},
 	{
