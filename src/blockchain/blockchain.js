@@ -16,11 +16,16 @@ const abi = fs.readFileSync(
 const provider = new ethers.JsonRpcProvider(process.env.RPC_URL);
 
 // Your contract's address and ABI
-const contractAddress = process.env.CONTRACT_ADDRESS;
+var contractAddress = process.env.CONTRACT_ADDRESS;
 
 // Connect to the contract
-const contract = new ethers.Contract(contractAddress, abi, provider);
+var contract = new ethers.Contract(contractAddress, abi, provider);
 const signer = new ethers.Wallet(process.env.PRIVATE_KEY, provider);
+
+async function connectToContract(address) {
+  contractAddress = address;
+  contract = new ethers.Contract(contractAddress, abi, provider);
+}
 
 async function addManager(newManagerAddress) {
   const contractWithSigner = contract.connect(signer);
@@ -154,8 +159,6 @@ async function getContractTransactions() {
   return transactionDetails;
 }
 
-getContractTransactions().then(() => {});
-
 module.exports = {
   addManager,
   fundProject,
@@ -166,4 +169,5 @@ module.exports = {
   sendEtherToContract,
   getSigner,
   getContractTransactions,
+  connectToContract,
 };
