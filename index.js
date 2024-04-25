@@ -98,6 +98,7 @@ app.get("/projects", async (req, res) => {
 });
 
 app.get("/projects/:id", async (req, res) => {
+<<<<<<< HEAD
   try {
     const id = req.params.id;
     await connectToContract(id);
@@ -107,6 +108,16 @@ app.get("/projects/:id", async (req, res) => {
       res
         .status(StatusCodes.OK)
         .json({ projectDetails: projectStatus, transactions: transactions });
+=======
+    try {
+        const id = req.params.id;
+        const document = await projectCollection.findOne({ contractAddress: id });
+        if (document) {
+            res.status(StatusCodes.OK).json(document)
+        }
+    } catch (error) {
+        res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({ error: "An error occured while fetching project" });
+>>>>>>> 5b83711 (added project/:id api)
     }
   } catch (error) {
     res
