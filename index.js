@@ -83,7 +83,7 @@ app.get("/projects", async (req, res) => {
 app.get("/projects/:id", async (req, res) => {
     try {
         const id = req.params.id;
-        const document = await projectCollection.findOne({ _id: id });
+        const document = await projectCollection.findOne({ contractAddress: id });
         if (document) {
             res.status(StatusCodes.OK).json(document)
         }
