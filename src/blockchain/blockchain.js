@@ -117,7 +117,6 @@ async function getContractTransactions() {
   const transactions = await Promise.all(
     logs.map(async (log) => await provider.getTransaction(log.transactionHash))
   );
-  console.log("transacion count:", transactions.length);
 
   const transactionDetails = await Promise.all(
     transactions.map((tx) => {
@@ -152,7 +151,6 @@ async function getContractTransactions() {
       }
     })
   );
-  console.log("tx details:", transactionDetails);
   return transactionDetails;
 }
 

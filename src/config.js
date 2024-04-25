@@ -26,5 +26,5 @@ run().catch(console.dir);
 
 // collection part
 const collection = client.db("fairflowAccounts").collection("users");
-
-module.exports = collection;
+const projectCollection = client.db("fairflowAccounts").collection("projects");
+module.exports = { collection, projectCollection };

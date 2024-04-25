@@ -13,7 +13,7 @@ const {
 } = require("./src/blockchain/blockchain");
 
 // mongodb call
-const collection = require("./src/config");
+const { collection, projectCollection } = require("./src/config");
 // web3 call
 require("./src/blockchain/blockchain");
 
@@ -43,14 +43,6 @@ app.use(
     cookie: { secure: false },
   })
 );
-
-// app.use(express.static(path.join(__dirname, "login")));
-// app.get("/", (req, res) => {
-//   res.sendFile(path.join(__dirname, "login", "login.html"));
-// });
-// app.get("/signup", (req, res) => {
-//   res.sendFile(path.join(__dirname, "login", "signup.html"));
-// });
 
 app.get("/api", (req, res) => {
   res.status(200).json({ message: `Api alive at ${port}` });
@@ -82,6 +74,17 @@ app.post("/signup", async (req, res) => {
   }
 });
 
+app.get("/projects", async (req, res) => {
+  try {
+    const documents = await projectCollection.find().toArray();
+    if (documents) {
+      res.status(StatusCodes.OK).send(documents);
+    }
+  } catch (error) {
+    console.log("An error has occured, details are:", error);
+  }
+});
+
 app.post("/login", async (req, res) => {
   const { username, password } = req.body;
   const user = await collection.findOne({ name: username });
@@ -102,10 +105,7 @@ app.post("/login", async (req, res) => {
 app.get("/project/status", async (req, res) => {
   try {
     const result = await getProjectStatus();
-    console.log(`Data received`, result);
-    // const temp = removeBigInts(result);
     const txs = await getContractTransactions();
-    console.log("Got transactions", txs);
     const blockCount = txs.length;
 
     if (result)
