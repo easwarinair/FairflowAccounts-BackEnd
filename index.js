@@ -7,7 +7,11 @@ const { StatusCodes } = require("http-status-codes");
 const { removeBigInts } = require("./src/utils/removeBigInt");
 
 // blockchain status
-const { getProjectStatus, getContractTransactions, connectToContract } = require("./src/blockchain/blockchain");
+const {
+  getProjectStatus,
+  getContractTransactions,
+  connectToContract,
+} = require("./src/blockchain/blockchain");
 
 // mongodb call
 const { collection, projectCollection } = require("./src/config");
@@ -24,21 +28,24 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(morgan("tiny"));
 const corsOptions = {
-    origin: ["https://fair-flow-accounts-front-end.vercel.app", "http://localhost:3000"], // List of allowed origins
-    optionsSuccessStatus: 200,
-    credentials: true, // This is needed if your front-end needs to send credentials like cookies or authentication headers.
-    allowedHeaders: ["Content-Type", "Authorization"],
-    methods: ["GET", "POST", "PUT", "DELETE"],
+  origin: [
+    "https://fair-flow-accounts-front-end.vercel.app",
+    "http://localhost:3000",
+  ], // List of allowed origins
+  optionsSuccessStatus: 200,
+  credentials: true, // This is needed if your front-end needs to send credentials like cookies or authentication headers.
+  allowedHeaders: ["Content-Type", "Authorization"],
+  methods: ["GET", "POST", "PUT", "DELETE"],
 };
 app.use(cors(corsOptions));
 
 app.use(
-    session({
-        secret: "your secret key",
-        resave: false,
-        saveUninitialized: true,
-        cookie: { secure: false },
-    })
+  session({
+    secret: "your secret key",
+    resave: false,
+    saveUninitialized: true,
+    cookie: { secure: false },
+  })
 );
 
 // async function test(id) {
@@ -53,110 +60,123 @@ app.use(
 // test("0x6971A6F7b7CBA9a5cFeCa8dC0df40A1E08ea9f28");
 
 app.get("/api", (req, res) => {
-    res.status(200).json({ message: `Api alive at ${port}` });
+  res.status(200).json({ message: `Api alive at ${port}` });
 });
 
 app.post("/signup", async (req, res) => {
-    const { username, password } = req.body;
-    try {
-        const existingUser = await collection.findOne({ name: username });
+  const { username, password } = req.body;
+  try {
+    const existingUser = await collection.findOne({ name: username });
 
-        if (existingUser) {
-            return res.status(StatusCodes.CONFLICT).json({
-                error: "User already exists. Please choose a different username.",
-            });
-        }
-
-        // hashing password
-        const saltRounds = 10;
-        const hashedPassword = await bcrypt.hash(password, saltRounds);
-
-        const newUser = { name: username, password: hashedPassword };
-        await collection.insertMany([newUser]);
-        res.status(StatusCodes.CREATED).json({ id: newUser._id });
-    } catch (error) {
-        console.error("Signup error:", error);
-        res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({ error: "An error occured during the signup process" });
+    if (existingUser) {
+      return res.status(StatusCodes.CONFLICT).json({
+        error: "User already exists. Please choose a different username.",
+      });
     }
+
+    // hashing password
+    const saltRounds = 10;
+    const hashedPassword = await bcrypt.hash(password, saltRounds);
+
+    const newUser = { name: username, password: hashedPassword };
+    await collection.insertMany([newUser]);
+    res.status(StatusCodes.CREATED).json({ id: newUser._id });
+  } catch (error) {
+    console.error("Signup error:", error);
+    res
+      .status(StatusCodes.INTERNAL_SERVER_ERROR)
+      .json({ error: "An error occured during the signup process" });
+  }
 });
 
 app.get("/projects", async (req, res) => {
-    try {
-        const documents = await projectCollection.find().toArray();
-        if (documents) {
-            res.status(StatusCodes.OK).send(documents);
-        }
-    } catch (error) {
-        console.log("An error has occured, details are:", error);
+  try {
+    const documents = await projectCollection.find().toArray();
+    if (documents) {
+      res.status(StatusCodes.OK).send(documents);
     }
+  } catch (error) {
+    console.log("An error has occured, details are:", error);
+  }
 });
 
 app.get("/projects/:id", async (req, res) => {
-    try {
-        const id = req.params.id;
-        await connectToContract(id);
-        const projectStatus = await getProjectStatus();
-        const transactions = await getContractTransactions();
-        if (document) {
-            res.status(StatusCodes.OK).json({ projectDetails: projectStatus, transactions: transactions });
-        }
-    } catch (error) {
-        res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({ error: "An error occured while fetching project", data: error });
+  try {
+    const id = req.params.id;
+    await connectToContract(id);
+    const projectStatus = await getProjectStatus();
+    console.log(projectStatus);
+    const transactions = await getContractTransactions();
+    console.log(transactions);
+    if (projectStatus && transactions) {
+      res
+        .status(StatusCodes.OK)
+        .json({ projectDetails: projectStatus, transactions: transactions });
     }
+  } catch (error) {
+    res
+      .status(StatusCodes.INTERNAL_SERVER_ERROR)
+      .json({ error: "An error occured while fetching project", data: error });
+  }
 });
 
 app.post("/login", async (req, res) => {
-    const { username, password } = req.body;
-    const user = await collection.findOne({ name: username });
+  const { username, password } = req.body;
+  const user = await collection.findOne({ name: username });
 
-    if (!user) {
-        res.send("User name cannot be found");
+  if (!user) {
+    res.send("User name cannot be found");
+  } else {
+    const isPasswordMatch = await bcrypt.compare(password, user.password);
+    if (isPasswordMatch) {
+      req.session.username = username;
+      res.status(StatusCodes.OK).json({ id: req.session.username });
     } else {
-        const isPasswordMatch = await bcrypt.compare(password, user.password);
-        if (isPasswordMatch) {
-            req.session.username = username;
-            res.status(StatusCodes.OK).json({ id: req.session.username });
-        } else {
-            res.status(StatusCodes.BAD_REQUEST).json({ error: "Wrong Password" });
-        }
+      res.status(StatusCodes.BAD_REQUEST).json({ error: "Wrong Password" });
     }
+  }
 });
 
 app.get("/project/status", async (req, res) => {
-    try {
-        const result = await getProjectStatus();
-        const txs = await getContractTransactions();
-        const blockCount = txs.length;
+  try {
+    const result = await getProjectStatus();
+    const txs = await getContractTransactions();
+    const blockCount = txs.length;
 
-        if (result) res.status(StatusCodes.OK).json({ result: result, blockCount: blockCount, transactions: txs });
-        else
-            res.status(StatusCodes.SERVICE_UNAVAILABLE).json({
-                error: "An error occured while fetching status from blockchain",
-            });
-    } catch (err) {
-        console.error(err);
-        res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
-            error: "An error occured while fetching status from blockchain",
-        });
-    }
+    if (result)
+      res
+        .status(StatusCodes.OK)
+        .json({ result: result, blockCount: blockCount, transactions: txs });
+    else
+      res.status(StatusCodes.SERVICE_UNAVAILABLE).json({
+        error: "An error occured while fetching status from blockchain",
+      });
+  } catch (err) {
+    console.error(err);
+    res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
+      error: "An error occured while fetching status from blockchain",
+    });
+  }
 });
 const port = 6969;
 const tryListen = (port) => {
-    app.listen(port, () => {
-        console.log(`Server listening on port ${port}`);
-    }).on("error", (err) => {
-        if (err.code === "EADDRINUSE") {
-            // Port is already in use, select a random port excluding commonly used ports
-            const excludedPorts = [80, 443, 8080]; // Add more ports to exclude if needed
-            let newPort;
-            do {
-                newPort = Math.floor(Math.random() * 65536); // Random port between 0 and 65535
-            } while (excludedPorts.includes(newPort));
-            tryListen(newPort); // Try listening on the new port
-        } else {
-            // Some other error occurred, log it
-            console.error(err);
-        }
+  app
+    .listen(port, () => {
+      console.log(`Server listening on port ${port}`);
+    })
+    .on("error", (err) => {
+      if (err.code === "EADDRINUSE") {
+        // Port is already in use, select a random port excluding commonly used ports
+        const excludedPorts = [80, 443, 8080]; // Add more ports to exclude if needed
+        let newPort;
+        do {
+          newPort = Math.floor(Math.random() * 65536); // Random port between 0 and 65535
+        } while (excludedPorts.includes(newPort));
+        tryListen(newPort); // Try listening on the new port
+      } else {
+        // Some other error occurred, log it
+        console.error(err);
+      }
     });
 };
 
