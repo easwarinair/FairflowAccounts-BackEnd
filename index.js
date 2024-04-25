@@ -24,7 +24,7 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(morgan("tiny"));
 const corsOptions = {
-    origin: "https://fair-flow-accounts-front-end.vercel.app", // This is the frontend origin
+    origin: ["https://fair-flow-accounts-front-end.vercel.app", "http://localhost:3000"], // List of allowed origins
     optionsSuccessStatus: 200,
     credentials: true, // This is needed if your front-end needs to send credentials like cookies or authentication headers.
     allowedHeaders: ["Content-Type", "Authorization"],
