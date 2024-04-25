@@ -85,10 +85,10 @@ app.get("/projects/:id", async (req, res) => {
         const id = req.params.id;
         const document = await projectCollection.findOne({ _id: id });
         if (document) {
-            res.status(StatusCodes.OK).send(document);
+            res.status(StatusCodes.OK).json(document)
         }
     } catch (error) {
-        console.log("An error has occured, details are:", error);
+        res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({ error: "An error occured while fetching project" });
     }
 });
 
