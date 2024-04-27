@@ -74,7 +74,11 @@ app.post("/signup", async (req, res) => {
     }
     const saltRounds = 10;
     const hashedPassword = await bcrypt.hash(password, saltRounds);
-    const newUser = { name: username, email: email, password: hashedPassword };
+    const newUser = { name: username, email: email, password: hashedPassword, authLevel: 0 };
+
+    
+
+    
     await collection.insertOne(newUser);
     res.status(StatusCodes.CREATED).json({ id: newUser._id });
   } catch (error) {
