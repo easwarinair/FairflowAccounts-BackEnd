@@ -125,10 +125,15 @@ app.get("/projects/:id", async (req, res) => {
     console.log(projectStatus);
     const transactions = await getContractTransactions();
     console.log(transactions);
+    const blockCount = txs.length;
     if (projectStatus && transactions) {
       res
         .status(StatusCodes.OK)
-        .json({ projectDetails: projectStatus, transactions: transactions });
+        .json({
+          projectDetails: projectStatus,
+          transactions: transactions,
+          blockCount: blockCount,
+        });
     }
   } catch (error) {
     res
