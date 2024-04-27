@@ -64,39 +64,53 @@ app.get("/api", (req, res) => {
 });
 
 app.post("/signup", async (req, res) => {
-  const { username, password } = req.body;
+  const { username, email, password } = req.body;
   try {
-    const existingUser = await collection.findOne({ name: username });
-
+    const existingUser = await collection.findOne({ email: email });
     if (existingUser) {
       return res.status(StatusCodes.CONFLICT).json({
-        error: "User already exists. Please choose a different username.",
+        error:
+          "User already exists with this email. Please use a different email.",
       });
     }
-
-    // hashing password
     const saltRounds = 10;
     const hashedPassword = await bcrypt.hash(password, saltRounds);
-
-    const newUser = { name: username, password: hashedPassword };
-    await collection.insertMany([newUser]);
+    const newUser = {
+      name: username,
+      email: email,
+      password: hashedPassword,
+      authLevel: 0,
+    };
+    await collection.insertOne(newUser);
     res.status(StatusCodes.CREATED).json({ id: newUser._id });
   } catch (error) {
     console.error("Signup error:", error);
-    res
-      .status(StatusCodes.INTERNAL_SERVER_ERROR)
-      .json({ error: "An error occured during the signup process" });
+    res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
+      error: "An error occurred during the signup process.",
+    });
+  }
+});
+
+app.post("/login", async (req, res) => {
+  const { email, password } = req.body;
+  const user = await collection.findOne({ email: email });
+  if (!user) {
+    return res.status(StatusCodes.NOT_FOUND).send("Email not found.");
+  }
+  const isPasswordMatch = await bcrypt.compare(password, user.password);
+  if (isPasswordMatch) {
+    req.session.user = user.email; // Store email in session
+    res.status(StatusCodes.OK).json({ id: user._id });
+  } else {
+    res.status(StatusCodes.BAD_REQUEST).json({ error: "Incorrect password." });
   }
 });
 
 app.get("/projects", async (req, res) => {
   try {
-    console.log("Getting data from database...");
     const documents = await projectCollection.find().toArray();
     if (documents) {
       res.status(StatusCodes.OK).send(documents);
-    } else {
-      console.log("Data not found error!");
     }
   } catch (error) {
     console.log("An error has occured, details are:", error);
@@ -120,23 +134,6 @@ app.get("/projects/:id", async (req, res) => {
     res
       .status(StatusCodes.INTERNAL_SERVER_ERROR)
       .json({ error: "An error occured while fetching project", data: error });
-  }
-});
-
-app.post("/login", async (req, res) => {
-  const { username, password } = req.body;
-  const user = await collection.findOne({ name: username });
-
-  if (!user) {
-    res.send("User name cannot be found");
-  } else {
-    const isPasswordMatch = await bcrypt.compare(password, user.password);
-    if (isPasswordMatch) {
-      req.session.username = username;
-      res.status(StatusCodes.OK).json({ id: req.session.username });
-    } else {
-      res.status(StatusCodes.BAD_REQUEST).json({ error: "Wrong Password" });
-    }
   }
 });
 
