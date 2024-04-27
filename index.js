@@ -91,9 +91,12 @@ app.post("/signup", async (req, res) => {
 
 app.get("/projects", async (req, res) => {
   try {
+    console.log("Getting data from database...");
     const documents = await projectCollection.find().toArray();
     if (documents) {
       res.status(StatusCodes.OK).send(documents);
+    } else {
+      console.log("Data not found error!");
     }
   } catch (error) {
     console.log("An error has occured, details are:", error);
