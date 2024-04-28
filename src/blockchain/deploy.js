@@ -93,16 +93,14 @@ async function main() {
 
   const contractFactory = new ethers.ContractFactory(abi, bin, wallet);
   const contract = await contractFactory.deploy(
-    "RIT Lecture Block Construction",
-    "This project tracks the progress of the lecture block construction at RIT, Kottayam.",
-    "40000000000000000000",
+    "Thrissur Veterinary Hospital Electrification Project",
+    "Electrification of the veterinary hospital as part of the annual development plan for Valappad GP.",
+    "300000000000000000000",
     [
-      "Design",
-      "Foundation",
-      "Structure",
-      "Plastering",
-      "Electricity and Plumbing",
-      "Painting",
+      "Procurement of Electrical Materials",
+      "Electrical Installation Work",
+      "System Testing",
+      "Operational Trail",
     ]
   );
   console.log("Deploying contract...");

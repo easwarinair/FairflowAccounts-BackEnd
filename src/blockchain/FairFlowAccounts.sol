@@ -8,6 +8,8 @@ contract FairFlowAccounts {
     event PhaseUpdated(uint phase);
     event PhaseCompleted(uint phase);
     event ManagerAdded(address newManager, address oldManager);
+    event ManagerRemoved(address manager);
+
     address public owner;
     mapping(address => bool) public managers;
     string public projectTitle;
@@ -67,6 +69,11 @@ contract FairFlowAccounts {
         emit ManagerAdded(_newManager, msg.sender);
     }
 
+    function removeManager(address manager) public onlyOwner {
+        managers[manager] = false;
+        emit ManagerRemoved(manager);
+    }
+
     function fundProject() public payable {
         totalFundsReceived += msg.value;
         income[msg.sender] += msg.value;
@@ -109,6 +116,7 @@ contract FairFlowAccounts {
         view
         returns (
             string memory,
+            string memory,
             uint,
             string memory,
             string memory,
@@ -121,6 +129,7 @@ contract FairFlowAccounts {
         uint256 bal = address(this).balance;
         return (
             projectTitle,
+            projectDescription,
             currentPhase,
             phase.description,
             phase.updates,
