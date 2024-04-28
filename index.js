@@ -99,7 +99,7 @@ app.post("/login", async (req, res) => {
   }
   const isPasswordMatch = await bcrypt.compare(password, user.password);
   if (isPasswordMatch) {
-    req.session.user = user.email; // Store email in session
+    req.session.user = { id: user._id, email: user.email, username: user.name };
     res.status(StatusCodes.OK).json({ id: user._id });
   } else {
     res.status(StatusCodes.BAD_REQUEST).json({ error: "Incorrect password." });
