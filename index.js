@@ -5,8 +5,8 @@ const root_dir = __dirname.split("src")[0];
 dotenv.config({ path: path.join(root_dir, `.env`) });
 const { StatusCodes } = require("http-status-codes");
 const { removeBigInts } = require("./src/utils/removeBigInt");
-const { attachCookie } = require("./src/utils/auth.utils");
-const ObjectId = require('mongodb').ObjectId;
+const { attachCookie, clearCookie } = require("./src/utils/auth.utils");
+const ObjectId = require("mongodb").ObjectId;
 
 // blockchain status
 const {
@@ -110,24 +110,17 @@ app.post("/login", async (req, res) => {
 
 app.get("/user", verifyToken, async (req, res) => {
   const { id } = req.user;
-  console.log(id)
-  const user = await collection.findOne({_id: new ObjectId(id)});
+  const user = await collection.findOne({ _id: new ObjectId(id) });
   if (!user) {
     return res.status(StatusCodes.NOT_FOUND).send("User not found.");
   }
-  delete user.password
+  delete user.password;
   res.status(StatusCodes.OK).json({ id: user._id, user });
 });
 
-app.get("/user", verifyToken, async (req, res) => {
-  const { id } = req.user;
-  console.log(id)
-  const user = await collection.findOne({_id: new ObjectId(id)});
-  if (!user) {
-    return res.status(StatusCodes.NOT_FOUND).send("User not found.");
-  }
-  delete user.password
-  res.status(StatusCodes.OK).json({ id: user._id, user });
+app.get("/logout", verifyToken, async (req, res) => {
+  clearCookie(res, "token");
+  res.status(StatusCodes.OK).json({ message: "User logged out successfully!" });
 });
 
 app.get("/projects", async (req, res) => {

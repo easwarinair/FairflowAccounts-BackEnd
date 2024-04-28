@@ -6,7 +6,6 @@ const { isTokenValid } = require("../utils/jwt.utils");
 const verifyToken = (req, res, next) => {
   let temp = req.headers?.cookie;
   let token = temp?.split("token=")[1];
-  console.log(token)
   if (!token) {
     throw new CustomError(
       "Token not present. Please login again!",
