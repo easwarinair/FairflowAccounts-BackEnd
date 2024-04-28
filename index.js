@@ -5,6 +5,7 @@ const root_dir = __dirname.split("src")[0];
 dotenv.config({ path: path.join(root_dir, `.env`) });
 const { StatusCodes } = require("http-status-codes");
 const { removeBigInts } = require("./src/utils/removeBigInt");
+const { attachCookie } = require("./src/utils/auth.utils");
 
 // blockchain status
 const {
@@ -12,6 +13,7 @@ const {
   getContractTransactions,
   connectToContract,
 } = require("./src/blockchain/blockchain");
+const verifyToken = require("./src/middleware/verifyToken");
 
 // mongodb call
 const { collection, projectCollection } = require("./src/config");
@@ -38,15 +40,6 @@ const corsOptions = {
   methods: ["GET", "POST", "PUT", "DELETE"],
 };
 app.use(cors(corsOptions));
-
-app.use(
-  session({
-    secret: "your secret key",
-    resave: false,
-    saveUninitialized: true,
-    cookie: { secure: false },
-  })
-);
 
 // async function test(id) {
 //   await connectToContract(id);
@@ -99,11 +92,27 @@ app.post("/login", async (req, res) => {
   }
   const isPasswordMatch = await bcrypt.compare(password, user.password);
   if (isPasswordMatch) {
-    req.session.user = user.email; // Store email in session
+    const t = createJwt(
+      {
+        id: user._id,
+      },
+      process.env.TOKEN_EXPIRE,
+      process.env.TOKEN_SECRET
+    );
+    attachCookie(t, res, "token");
     res.status(StatusCodes.OK).json({ id: user._id });
   } else {
     res.status(StatusCodes.BAD_REQUEST).json({ error: "Incorrect password." });
   }
+});
+
+app.get("/user", verifyToken, async (req, res) => {
+  const { id } = req.user;
+  const user = await collection.findOne({ _id: id });
+  if (!user) {
+    return res.status(StatusCodes.NOT_FOUND).send("User not found.");
+  }
+  res.status(StatusCodes.OK).json({ id: user._id, user });
 });
 
 app.get("/projects", async (req, res) => {
@@ -162,26 +171,8 @@ app.get("/project/status", async (req, res) => {
     });
   }
 });
-const port = 6969;
-const tryListen = (port) => {
-  app
-    .listen(port, () => {
-      console.log(`Server listening on port ${port}`);
-    })
-    .on("error", (err) => {
-      if (err.code === "EADDRINUSE") {
-        // Port is already in use, select a random port excluding commonly used ports
-        const excludedPorts = [80, 443, 8080]; // Add more ports to exclude if needed
-        let newPort;
-        do {
-          newPort = Math.floor(Math.random() * 65536); // Random port between 0 and 65535
-        } while (excludedPorts.includes(newPort));
-        tryListen(newPort); // Try listening on the new port
-      } else {
-        // Some other error occurred, log it
-        console.error(err);
-      }
-    });
-};
 
-tryListen(port); // Start by trying port 6969
+const port = 6969;
+app.listen(port, () => {
+  console.log(`Server listening on port ${port}`);
+});
