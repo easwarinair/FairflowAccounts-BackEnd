@@ -12,6 +12,7 @@ function isTokenValid(token, key) {
     const response = jwt.verify(token, key);
     return response;
   } catch (err) {
+    console.log(err)
     return false;
   }
 }

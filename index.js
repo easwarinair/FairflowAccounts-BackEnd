@@ -6,6 +6,7 @@ dotenv.config({ path: path.join(root_dir, `.env`) });
 const { StatusCodes } = require("http-status-codes");
 const { removeBigInts } = require("./src/utils/removeBigInt");
 const { attachCookie } = require("./src/utils/auth.utils");
+const ObjectId = require('mongodb').ObjectId;
 
 // blockchain status
 const {
@@ -24,6 +25,7 @@ const bcrypt = require("bcrypt");
 const cors = require("cors");
 const session = require("express-session");
 const morgan = require("morgan");
+const { createJwt } = require("./src/utils/jwt.utils");
 
 const app = express();
 app.use(express.json());
@@ -108,10 +110,23 @@ app.post("/login", async (req, res) => {
 
 app.get("/user", verifyToken, async (req, res) => {
   const { id } = req.user;
-  const user = await collection.findOne({ _id: id });
+  console.log(id)
+  const user = await collection.findOne({_id: new ObjectId(id)});
   if (!user) {
     return res.status(StatusCodes.NOT_FOUND).send("User not found.");
   }
+  delete user.password
+  res.status(StatusCodes.OK).json({ id: user._id, user });
+});
+
+app.get("/user", verifyToken, async (req, res) => {
+  const { id } = req.user;
+  console.log(id)
+  const user = await collection.findOne({_id: new ObjectId(id)});
+  if (!user) {
+    return res.status(StatusCodes.NOT_FOUND).send("User not found.");
+  }
+  delete user.password
   res.status(StatusCodes.OK).json({ id: user._id, user });
 });
 
