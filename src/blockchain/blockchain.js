@@ -205,10 +205,10 @@ async function getContractTransactions() {
   return transactionDetails;
 }
 
-async function run() {
-  console.log(await getContractTransactions());
-}
-run();
+// async function run() {
+//   console.log(await getContractTransactions());
+// }
+// run();
 
 module.exports = {
   addManager,

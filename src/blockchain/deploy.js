@@ -77,7 +77,12 @@ function writeCAToEnv(hash) {
   });
 }
 
-async function main() {
+async function deployContract(
+  projectTitle,
+  projectDescription,
+  fundsRequired,
+  projectPhases
+) {
   const url = process.env.RPC_URL;
   const provider = new ethers.JsonRpcProvider(url);
   const wallet = new ethers.Wallet(process.env.PRIVATE_KEY, provider);
@@ -93,15 +98,10 @@ async function main() {
 
   const contractFactory = new ethers.ContractFactory(abi, bin, wallet);
   const contract = await contractFactory.deploy(
-    "Thrissur Veterinary Hospital Electrification Project",
-    "Electrification of the veterinary hospital as part of the annual development plan for Valappad GP.",
-    "300000000000000000000",
-    [
-      "Procurement of Electrical Materials",
-      "Electrical Installation Work",
-      "System Testing",
-      "Operational Trail",
-    ]
+    projectTitle,
+    projectDescription,
+    fundsRequired,
+    projectPhases
   );
   console.log("Deploying contract...");
   const response = await contract.waitForDeployment();
@@ -114,4 +114,4 @@ async function main() {
   writeCAToEnv(txRec.contractAddress);
 }
 
-main();
+deployContract();
