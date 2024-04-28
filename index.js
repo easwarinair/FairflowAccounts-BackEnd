@@ -117,13 +117,14 @@ app.get("/projects", async (req, res) => {
   }
 });
 
-app.get("/projects/:id", async (req, res) => {
+app.get("/projects/:id/:hash", async (req, res) => {
   try {
     const id = req.params.id;
+    const hash = req.params.hash;
     await connectToContract(id);
     const projectStatus = await getProjectStatus();
     console.log(projectStatus);
-    const transactions = await getContractTransactions();
+    const transactions = await getContractTransactions(hash);
     console.log(transactions);
     const blockCount = transactions.length;
     if (projectStatus && transactions) {
@@ -134,6 +135,7 @@ app.get("/projects/:id", async (req, res) => {
       });
     }
   } catch (error) {
+    console.log(error);
     res
       .status(StatusCodes.INTERNAL_SERVER_ERROR)
       .json({ error: "An error occured while fetching project", data: error });

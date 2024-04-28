@@ -23,15 +23,11 @@ var contractAddress = process.env.CONTRACT_ADDRESS;
 var contract = new ethers.Contract(contractAddress, abi, provider);
 const signer = new ethers.Wallet(process.env.PRIVATE_KEY, provider);
 
-async function checkAddress(address) {
-  try {
-    if (isAddress(address)) return address;
-    else {
-      const error = new Error("Invalid Address!");
-      error.code = "INVALID_ADDRESS_ERROR";
-      throw error;
-    }
-  } catch (error) {
+function checkAddress(address) {
+  if (isAddress(address)) return address;
+  else {
+    const error = new Error("Invalid Address!");
+    error.code = "INVALID_ADDRESS_ERROR";
     throw error;
   }
 }
@@ -39,10 +35,10 @@ async function checkAddress(address) {
 async function connectToContract(address) {
   try {
     contractAddress = checkAddress(address);
+    contract = new ethers.Contract(contractAddress, abi, provider);
   } catch (error) {
     console.log("An error has occured. Details are:", error);
   }
-  contract = new ethers.Contract(contractAddress, abi, provider);
 }
 
 async function addManager(newManagerAddress) {
@@ -140,7 +136,7 @@ function makeTransaction(signature, args, value, sender, receiver, timestamp) {
   return transaction;
 }
 
-async function getContractTransactions() {
+async function getContractTransactions(hash) {
   const logs = await provider.getLogs({
     fromBlock: 0,
     toBlock: "latest",
@@ -169,7 +165,7 @@ async function getContractTransactions() {
   const transactionDetails = await Promise.all(
     transactions.map((tx, i) => {
       // console.log(timestamps[i].toUTCString());
-      if (tx.hash == process.env.TX_HASH) {
+      if (tx.hash == hash) {
         return makeTransaction(
           "contractCreated()",
           "",
