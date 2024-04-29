@@ -5,7 +5,8 @@ const root_dir = __dirname.split("src")[0];
 dotenv.config({ path: path.join(root_dir, `.env`) });
 const { StatusCodes } = require("http-status-codes");
 const { removeBigInts } = require("./src/utils/removeBigInt");
-const { attachCookie } = require("./src/utils/auth.utils");
+const { attachCookie, clearCookie } = require("./src/utils/auth.utils");
+const ObjectId = require("mongodb").ObjectId;
 
 // blockchain status
 const {
@@ -24,6 +25,7 @@ const bcrypt = require("bcrypt");
 const cors = require("cors");
 const session = require("express-session");
 const morgan = require("morgan");
+const { createJwt } = require("./src/utils/jwt.utils");
 
 const app = express();
 app.use(express.json());
@@ -108,13 +110,18 @@ app.post("/login", async (req, res) => {
 
 app.get("/user", verifyToken, async (req, res) => {
   const { id } = req.user;
-  const user = await collection.findOne({ _id: id });
+  const user = await collection.findOne({ _id: new ObjectId(id) });
   if (!user) {
     return res.status(StatusCodes.NOT_FOUND).send("User not found.");
   }
   res
     .status(StatusCodes.OK)
     .json({ id: user._id, email: user.email, authLevel: user.authLevel });
+});
+
+app.get("/logout", verifyToken, async (req, res) => {
+  clearCookie(res, "token");
+  res.status(StatusCodes.OK).json({ message: "User logged out successfully!" });
 });
 
 app.get("/projects", async (req, res) => {
