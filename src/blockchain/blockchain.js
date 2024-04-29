@@ -14,14 +14,14 @@ const abi = fs.readFileSync(
 );
 
 // Connect to the Ethereum network
-const provider = new ethers.JsonRpcProvider(process.env.RPC_URL);
+const rpcProvider = new ethers.JsonRpcProvider(process.env.RPC_URL);
 
 // Your contract's address and ABI
 var contractAddress = process.env.CONTRACT_ADDRESS;
 
 // Connect to the contract
 var contract = new ethers.Contract(contractAddress, abi, provider);
-const signer = new ethers.Wallet(process.env.PRIVATE_KEY, provider);
+// const signer = new ethers.Wallet(process.env.PRIVATE_KEY, provider);
 
 function checkAddress(address) {
   if (isAddress(address)) return address;
@@ -35,7 +35,7 @@ function checkAddress(address) {
 async function connectToContract(address) {
   try {
     contractAddress = checkAddress(address);
-    contract = new ethers.Contract(contractAddress, abi, provider);
+    contract = new ethers.Contract(contractAddress, abi, rpcProvider);
   } catch (error) {
     console.log("An error has occured. Details are:", error);
   }
@@ -57,13 +57,13 @@ async function removeManager(newManagerAddress) {
   console.log(`Transaction hash: ${tx.hash}`);
 }
 
-async function fundProject(value) {
+async function fundProject(value, signer) {
   const contractWithSigner = contract.connect(signer);
   const tx = await contractWithSigner.fundProject({
     value: ethers.parseEther(value.toString()),
   });
   await tx.wait();
-  console.log(`Transaction hash: ${tx.hash}`);
+  return tx.hash;
 }
 
 async function updatePhase(updates) {

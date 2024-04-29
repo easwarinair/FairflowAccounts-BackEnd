@@ -13,6 +13,7 @@ const {
   getProjectStatus,
   getContractTransactions,
   connectToContract,
+  fundProject,
 } = require("./src/blockchain/blockchain");
 const verifyToken = require("./src/middleware/verifyToken");
 
@@ -151,6 +152,23 @@ app.get("/projects/:id/:hash", async (req, res) => {
         transactions: transactions,
         blockCount: blockCount,
       });
+    }
+  } catch (error) {
+    console.log(error);
+    res
+      .status(StatusCodes.INTERNAL_SERVER_ERROR)
+      .json({ error: "An error occured while fetching project", data: error });
+  }
+});
+
+app.post("/transact/fund", async (req, res) => {
+  try {
+    const { value, signer } = req.body;
+    const fund = await fundProject(value, signer);
+    if (fund) {
+      return res.status(StatusCodes.OK).json({ hash: fund });
+    } else {
+      return res.status(StatusCodes.BAD_REQUEST).send("Transaction failed!");
     }
   } catch (error) {
     console.log(error);
