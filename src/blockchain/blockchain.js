@@ -206,6 +206,7 @@ async function getContractTransactions(hash) {
 // }
 // run();
 
+// TODO: When adding/removing managers, add a check to see whether if they already are a manager or not
 module.exports = {
   addManager,
   removeManager,

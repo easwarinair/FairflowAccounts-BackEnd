@@ -107,11 +107,9 @@ async function deployContract(
   const response = await contract.waitForDeployment();
   const tx = await contract.deploymentTransaction();
   const txRec = await contract.deploymentTransaction().wait(1);
-  console.log(
-    `Contract deployed with tx hash ${tx.hash} @ contract address ${txRec.contractAddress}`
-  );
-  writeHashToEnv(tx.hash);
-  writeCAToEnv(txRec.contractAddress);
+  return { hash: tx.hash, contractAddress: txRec.contractAddress };
+  // writeHashToEnv(tx.hash);
+  // writeCAToEnv(txRec.contractAddress);
 }
 
 deployContract();

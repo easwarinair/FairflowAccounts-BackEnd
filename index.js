@@ -112,7 +112,9 @@ app.get("/user", verifyToken, async (req, res) => {
   if (!user) {
     return res.status(StatusCodes.NOT_FOUND).send("User not found.");
   }
-  res.status(StatusCodes.OK).json({ id: user._id, user });
+  res
+    .status(StatusCodes.OK)
+    .json({ id: user._id, email: user.email, authLevel: user.authLevel });
 });
 
 app.get("/projects", async (req, res) => {
