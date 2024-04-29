@@ -164,7 +164,9 @@ app.get("/projects/:id/:hash", async (req, res) => {
 app.post("/transact/fund", async (req, res) => {
   try {
     const { value, signer } = req.body;
-    const fund = await fundProject(value, signer);
+    const newSigner = JSON.parse(signer);
+    console.log(newSigner);
+    const fund = await fundProject(value);
     if (fund) {
       return res.status(StatusCodes.OK).json({ hash: fund });
     } else {

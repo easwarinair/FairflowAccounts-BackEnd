@@ -20,8 +20,8 @@ const rpcProvider = new ethers.JsonRpcProvider(process.env.RPC_URL);
 var contractAddress = process.env.CONTRACT_ADDRESS;
 
 // Connect to the contract
-var contract = new ethers.Contract(contractAddress, abi, provider);
-// const signer = new ethers.Wallet(process.env.PRIVATE_KEY, provider);
+var contract = new ethers.Contract(contractAddress, abi, rpcProvider);
+const signer = new ethers.Wallet(process.env.PRIVATE_KEY, rpcProvider);
 
 function checkAddress(address) {
   if (isAddress(address)) return address;
@@ -57,10 +57,10 @@ async function removeManager(newManagerAddress) {
   console.log(`Transaction hash: ${tx.hash}`);
 }
 
-async function fundProject(value, signer) {
+async function fundProject(value) {
   const contractWithSigner = contract.connect(signer);
   const tx = await contractWithSigner.fundProject({
-    value: ethers.parseEther(value.toString()),
+    value: ethers.parseUnits(value, "wei"),
   });
   await tx.wait();
   return tx.hash;
@@ -137,7 +137,7 @@ function makeTransaction(signature, args, value, sender, receiver, timestamp) {
 }
 
 async function getContractTransactions(hash) {
-  const logs = await provider.getLogs({
+  const logs = await rpcProvider.getLogs({
     fromBlock: 0,
     toBlock: "latest",
     address: contractAddress,
@@ -146,7 +146,9 @@ async function getContractTransactions(hash) {
   const interface = ethers.Interface.from(abi);
 
   const transactions = await Promise.all(
-    logs.map(async (log) => await provider.getTransaction(log.transactionHash))
+    logs.map(
+      async (log) => await rpcProvider.getTransaction(log.transactionHash)
+    )
   );
   const transactionReceipts = await Promise.all(
     transactions.map(async (tx) => await tx.wait(1))
