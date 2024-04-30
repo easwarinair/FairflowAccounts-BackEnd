@@ -180,6 +180,25 @@ app.post("/transact/fund", async (req, res) => {
   }
 });
 
+app.post("/deployContract", async (req, res) => {
+  try {
+    const { title, contractAddress, txHash } = req.body;
+    const contractDetails = {
+      contractAddress: contractAddress,
+      projectTitle: title,
+      txHash: txHash,
+    };
+    await projectCollection.insertOne(contractDetails);
+    res.status(StatusCodes.CREATED).json({ id: contractDetails._id });
+  } catch (error) {
+    console.log(error);
+    res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
+      error: "An error occured while adding the project to the database",
+      data: error,
+    });
+  }
+});
+
 app.get("/project/status", async (req, res) => {
   try {
     const result = await getProjectStatus();
