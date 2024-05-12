@@ -75,7 +75,7 @@ app.post("/signup", async (req, res) => {
       name: username,
       email: email,
       password: hashedPassword,
-      authLevel: 0,
+      authLevel: 2,
     };
     await collection.insertOne(newUser);
     res.status(StatusCodes.CREATED).json({ id: newUser._id });
@@ -98,12 +98,15 @@ app.post("/login", async (req, res) => {
     const t = createJwt(
       {
         id: user._id,
+        authLevel: user.authLevel,
       },
       process.env.TOKEN_EXPIRE,
       process.env.TOKEN_SECRET
     );
     attachCookie(t, res, "token");
-    res.status(StatusCodes.OK).json({ id: user._id });
+    res
+      .status(StatusCodes.OK)
+      .json({ id: user._id, authLevel: user.authLevel });
   } else {
     res.status(StatusCodes.BAD_REQUEST).json({ error: "Incorrect password." });
   }
