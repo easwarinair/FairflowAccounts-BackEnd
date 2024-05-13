@@ -35,6 +35,7 @@ app.use(morgan("tiny"));
 const corsOptions = {
   origin: [
     "https://fair-flow-accounts-front-end.vercel.app",
+    "https://fairflowaccounts.vercel.app",
     "http://localhost:3000",
   ], // List of allowed origins
   optionsSuccessStatus: 200,
